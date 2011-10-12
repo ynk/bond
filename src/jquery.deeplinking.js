@@ -220,4 +220,22 @@ $.extend(
 				
 				that.swfid = args[1];
 				
-				if 
+				if (args[8] == undefined) { args[8] = {}; }
+				if (typeof args[8].id == undefined) { args[8].id = args[1]; }
+				
+				method.apply(this, args);
+			};
+		}
+		else if (typeof($.flash) != 'undefined')
+		{
+			var method = $.fn.flash;
+			
+			$.fn.flash = function(options)
+			{
+				that.swfid = $(this).attr('id');
+				method.apply(this, [options]);
+			}
+		}
+		else { $(document).ready(that.initialize); }
+    }()
+});
