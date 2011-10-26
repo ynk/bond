@@ -1,16 +1,16 @@
 $.extend(
 {
-    deeplinking: new function ()
-    {
+	deeplinking: new function ()
+	{
 		//scope definition
 		var that = this;
 	
 		//internal stuff
-		that.debug = typeof (console) != 'undefined';
+		that.debug = window.console && window.console.firebug;
 		that.log = that.debug ? console.log : function() {};
 	
 		that.html5 = (window.history.pushState != undefined);
-		that.IE = (typeof(window.ActiveXObject) != 'undefined') && (typeof(document.documentMode) != 'undefined') && (document.documentMode < 8);
+		that.IE = (typeof(window.ActiveXObject) != 'undefined') && (typeof(document.documentMode) != 'undefined') && (document.documentMode <= 8);
 		
 		that.timer;
 	
@@ -29,8 +29,6 @@ $.extend(
 		var host = undefined;
 			that.host = function()
 			{
-				if (!activated) { return null; }
-				
 				if (arguments.length == 0) { return gethost(); }
 				else { sethost(arguments[0]); }
 			};
@@ -40,8 +38,10 @@ $.extend(
 			{
 				var init = (host == undefined);
 	
-				if (s.indexOf('http') == -1) { host = window.location.protocol + '//' + s + '/'; }
+				if (s.indexOf('http') == -1) { host = window.location.protocol + '//' + s; }
 				else { host = s; }
+
+				if (host.charAt(host.length -1) == '/') { host = host.substr(0, host.length - 1); }
 	
 				if (init)
 				{
@@ -54,7 +54,7 @@ $.extend(
 					}
 	
 					value = !that.html5 ? that.hash() : window.location.href.replace(that.host(), '');
-	
+
 					if (!that.html5)
 					{
 						if (that.hash() == '')
@@ -77,15 +77,15 @@ $.extend(
 				else { setvalue(arguments[0]); }
 			};
 	
-			var getvalue = function() { return !that.html5 ? value.substr(1) : value; };
+			var getvalue = function() { return value; };
 			var setvalue = function(s)
 			{
 				if (value == s) { return; }
-				if (that.debug) { that.log('internal change'); }
-							
+				if (that.debug) { that.log('internal change', value, '=>', s); }
+
 				if (!that.html5)
 				{
-					value = '/' + s;
+					value = s;
 					
 					if (that.IE)
 					{
@@ -97,7 +97,8 @@ $.extend(
 								that.iframe.src = 'javascript:void(0)';
 								that.iframe.style.display = 'none';
 								that.iframe.tabindex = -1;
-						
+								that.iframe.title = document.getElementsByTagName('title')[0].innerHTML;
+
 							document.appendChild(that.iframe);
 						}
 						
@@ -107,24 +108,25 @@ $.extend(
 							iframe_document.close();
 							
 						that.iframe.contentWindow.document.location.hash = value;
+						document.title = that.iframe.title;
 					}
 					
 					window.location.hash = value;
-					that.oninternalchange.call(null, 'internal', value);
+					that.oninternalchange('internal', value);
 				}
 				else
 				{
 					value = s;
 					
 					window.history.pushState({}, '', value);
-					that.oninternalchange.call(null, 'internal', value);
+					that.oninternalchange('internal', value);
 				}
 			};
 	
 			that.url = function(v)
 			{
 				if (!activated) { return null; }
-				!that.html5 ? window.location.hash = '/' + v : window.history.pushState({}, '', v);
+				!that.html5 ? window.location.hash = v : window.history.pushState({}, '', v);
 			};
 	
 		var cron = function(e)
@@ -135,29 +137,31 @@ $.extend(
 				
 				if (value != that.hash())
 				{
-					if (that.debug) { that.log('external change'); }
+					if (that.debug) { that.log('external change', value, '=>', that.hash()); }
 	
 					value = that.hash();
 					if (that.IE && that.iframe != undefined) { that.iframe.contentWindow.document.location.hash = value; }
 					
-					that.onexternalchange.call(null, 'external', value);
+					that.onexternalchange('external', value);
 				}
 				else if ((that.iframe != undefined) && (that.iframe.contentWindow.document.location.hash.substr(1) != that.hash()))
 				{
+					if (that.debug) { that.log('external change',  value, '=>', that.iframe.contentWindow.document.location.hash.substr(1)); }
+
 					value = that.iframe.contentWindow.document.location.hash.substr(1);
 					window.location.hash = value;
 					
-					that.onexternalchange.call(null, 'external', value);
+					that.onexternalchange('external', value);
 				}
 			}
 			else
 			{
 				if (value != window.location.href.replace(that.host(), ''))
 				{
-					if (that.debug) { that.log('external change'); }
+					if (that.debug) { that.log('external change', value, '=>', window.location.href.replace(that.host(), '')); }
 					
 					value = window.location.href.replace(that.host(), '');
-					that.onexternalchange.call(null, 'external', value);
+					that.onexternalchange('external', value);
 				}
 			}
 		};
@@ -205,9 +209,9 @@ $.extend(
 				that.onexternalchange = function(type) { document.getElementById(that.swfid).deeplink('external'); };
 			}
 			
-			that.onready('ready');
+			that.onready('ready', value);
 		};
-			
+
 		//swfobject integration	
 		if (typeof(swfobject) != 'undefined')
 		{
@@ -215,8 +219,7 @@ $.extend(
 			
 			swfobject.embedSWF = function()
 			{
-				var args = new Array();
-				for (var i = 0; i < 10; i++) { args.push(arguments[i]); }
+				var args = [].slice.call(arguments);
 				
 				that.swfid = args[1];
 				
@@ -236,6 +239,5 @@ $.extend(
 				method.apply(this, [options]);
 			}
 		}
-		else { $(document).ready(that.initialize); }
-    }()
+	}()
 });
