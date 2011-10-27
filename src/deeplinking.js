@@ -130,7 +130,7 @@ var deeplinking = {};
 
 	that.path = function()
 	{
-		var path = value.replace(App.host(), '').substr(!App.html5 ? 1 : 0).split('/'), i = 0;
+		var path = value.replace(that.host(), '').substr(!that.html5 ? 1 : 0).split('/'), i = 0;
 		while(i < path.length)
 		{
 			 if (path[i].indexOf('?') > -1) { path[i] = path[i].split('?')[0]; }
