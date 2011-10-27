@@ -129,6 +129,38 @@ $.extend(
 				!that.html5 ? window.location.hash = v : window.history.pushState({}, '', v);
 			};
 	
+		that.path = function()
+		{
+			var path = value.replace(App.host(), '').substr(!App.html5 ? 1 : 0).split('/'), i = 0;
+			while(i < path.length)
+			{
+				 if (path[i].indexOf('?') > -1) { path[i] = path[i].split('?')[0]; }
+				 else if (path[i] == '' || path[i].charAt(0) == '?') { path.splice(i, 1); }
+				 else { i++; }
+			}
+			
+			return path;
+		};
+		
+		that.parameters = function()
+		{
+			var url = value.split('?');
+				url.shift();
+			
+			if (url.length == 0) { return null; }
+				
+			var pms = url[0].split('&'),
+				pm, obj = {};
+				
+			for (var i = 0; i < pms.length; i++)
+			{
+				pm = pms[i].split('=');
+				obj[pm[0]] = pm[1];
+			}	
+				
+			return obj;
+		};
+	
 		var cron = function(e)
 		{
 			if (!that.html5)
