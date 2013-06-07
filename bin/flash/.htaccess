@@ -1,7 +1,7 @@
 Options +FollowSymLinks
 RewriteEngine On
 
-RewriteBase /deeplinking/javascript/standalone/
+RewriteBase /flash/
 
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

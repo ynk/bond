@@ -1,7 +1,7 @@
 Options +FollowSymLinks
 RewriteEngine On
 
-RewriteBase /deeplinking/flash/jquery/
+RewriteBase /javascript/
 
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
