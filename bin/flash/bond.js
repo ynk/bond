@@ -294,4 +294,30 @@
 	}
 
 //	
+}).call(window.bond = {}, window, document);+ _.v + "'"); }
+			B.onready("ready", _.v, JSON.parse(_.q));
+
+		B.activate();
+		_.c();
+	};
+
+// swfobject integration	
+	if (!ndfnd(w.swfobject))
+	{
+		var method = swfobject.embedSWF;
+		
+		swfobject.embedSWF = function()
+		{
+			var args = [].slice.call(arguments);
+			
+			B.swf = args[1];
+			
+			if (ndfnd(args[8])) 	{ args[8] 		= {}; }
+			if (ndfnd(args[8].id)) 	{ args[8].id 	= args[1]; }
+			
+			method.apply(this, args);
+		};
+	}
+
+//	
 }).call(window.bond = {}, window, document);
