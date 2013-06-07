@@ -50,7 +50,6 @@
 
 	_.h = ""; //host
 	_.v = ""; //value
-	_.q = "null"; //querystring
 
 // hash getter
 	B.hash = function(q)
@@ -87,12 +86,11 @@
 	{
 		if ((B.hash().length != 0) && B.html5)
 		{
-			_.p.pushState({}, "", B.hash());
+			_.p.pushState({}, "", B.hash(true));
 			_.l.hash = "";
 		}
 
-		_.v = !B.html5 ? B.hash() : trmhst();
-		_.q = B.parameters(true);
+		_.v = !B.html5 ? B.hash(true) : trmhst(true);
 	}
 
 // value public interface & private getter/setter
@@ -105,17 +103,15 @@
 	_.gv = function() { return _.v; };
 	_.sv = function(s, q, e)
 	{
-		e = !ndfind(e) ? e : true;
+		e = !ndfnd(e) ? e : true;
 
 		if (_.v == s && _.q == q) { return; }
 		if (B.debug && e) { B.log("internal change", _.v, "=>", s); }
 
 		_.v = s;
-		_.q = JSON.stringify(q);
+		if (q != null) { _.v += "?" + qrystr(q); }
 
-		var y = q != null ? _.v + "?" + qrystr(q) : _.v;
-
-		if (B.html5) { _.p.pushState({}, "", y); }
+		if (B.html5) { _.p.pushState({}, "", _.v); }
 		else
 		{
 			if (B.IE)
@@ -136,20 +132,32 @@
 				}
 				
 				_.icd.open();
-				_.icd.write(("<html><body>%v</body></html>").replace("%v", y));
+				_.icd.write(("<html><body>%v</body></html>").replace("%v", _.v));
 				_.icd.close();
 					
-				_.icd.location.hash = y;
+				_.icd.location.hash = _.v;
 			}
 			
-			_.l.hash = y;
+			_.l.hash = _.v;
 		}
 
-		if (e) { B.oninternalchange("internal", _.v, JSON.parse(_.q)); }
+		if (e) { B.oninternalchange("internal", _.v, B.parameters()); }
 	};
 
-// url setter (simulate external changes)
-	B.url = function(s, q){ _.sv(s, q, false); };
+// silent url setter
+	B.url = function(s, q) { _.sv(s, q, false); };
+
+// simulate external changes
+	B.simulate = function(s, q)
+	{
+		q = !ndfnd(q) ? q : null;
+
+		var v = s;
+			if (q != null) { v += "?" + qrystr(q); }
+		
+		if (B.html5) { _.p.pushState({}, "", v); }
+		else { _.l.hash = v; }
+	}
 
 // path array getter
 	B.path = function()
@@ -183,16 +191,15 @@
 // cron url checker
 	_.c = function(e)
 	{
-		var u = false, o = _.v, n = "", m = B.parameters(true);
+		var u = false, o = _.v, n = "";
 
 		if (!B.html5)
 		{
-			n = B.hash();
+			n = B.hash(true);
 			
-			if (u = (_.v != n || _.q != m))
+			if (u = (_.v != n))
 			{
 				_.v = n;
-				_.q = m;
 
 				if (!ndfnd(_.i)) { _.icd.location.hash = n; }
 			}
@@ -200,24 +207,18 @@
 			{
 				n = _.icd.location.hash.substr(1);
 				_.v =_.l.hash = n;
-				_.q = m;
 			}
 		}
 		else
 		{
-			n = trmhst();
-
-			if (u = (_.v != n || _.q != m))
-			{
-				_.v = trmhst();
-				_.q = m;
-			}
+			n = trmhst(true);
+			if (u = (_.v != n)) { _.v = n; }
 		}
 
 		if (u)
 		{
 			if (B.debug) { B.log("external change", "'" + o + "'", "=>", "'" + n + "'"); }
-			B.onexternalchange("external", _.v, JSON.parse(_.q));
+			B.onexternalchange("external", _.v, B.parameters());
 		}
 	};
 
@@ -269,7 +270,7 @@
 		_.r();
 
 		if (B.debug) { B.log("bond ready", "'" + _.v + "'"); }
-			B.onready("ready", _.v, JSON.parse(_.q));
+			B.onready("ready", _.v, B.parameters());
 
 		B.activate();
 		_.c();

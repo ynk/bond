@@ -147,7 +147,7 @@
 					if (e.keyCode == 13)
 					{
 						e.preventDefault();
-						bond.url(input.value);
+						bond.simulate(input.value);
 					}
 					else { input.size = input.value.length != 0 ? input.value.length : 12; }
 				}
