@@ -4,9 +4,9 @@ Deeplinking library with html5 pushState support and hash/iframe fallback design
 **The only prerequisite is to set a `<base>` tag pointing to the root path of your application**
 
 ####Demos
-- [Javascript version](http://dev.martian-arts.org/bond/javascript/) : left/right arrow and left/right buttons to switch through a set of color. type into the input and press enter to set a custom url by yourself.
+- [Javascript version](http://dev.martian-arts.org/projects/bond/javascript/) : left/right arrow and left/right buttons to switch through a set of color. type into the input and press enter to set a custom url by yourself.
 
-- [Flash (html5 support disabled)](http://dev.martian-arts.org/bond/flash/) : go left/right to browse quotes from [andiquote](http://andiquote.com/) or click to load a random quote.
+- [Flash (html5 support disabled)](http://dev.martian-arts.org/projects/bond/flash/) : go left/right to browse quotes from [andiquote](http://andiquote.com/) or click to load a random quote.
 
 ---
 
