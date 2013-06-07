@@ -41,7 +41,7 @@ when dom is ready, use `bond.initialize` method to activate it with an optional 
 
 ```
 bond.initialize({
-	html5: <boolean> (default: automode),
+	html5: <boolean> (default: guess mode. set to false to force the use of the location.hash fallback),
 	
 	onready: <function> (event handler),
 	oninternalchange: <function> (event handler),
