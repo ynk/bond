@@ -2,6 +2,7 @@ bond
 ====
 
 Deeplinking library with html5 pushState support and hash/iframe fallback designed for both flash and javascript.
+**The only prerequisite is to set a `<base>` tag pointing to the root path of your application**
 
 ---
 
